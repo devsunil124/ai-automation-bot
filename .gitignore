@@ -1,0 +1,16 @@
+# Don't include secret keys
+.env
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
+
+# Virtual environment folder
+venv/
+
+# Log or temporary files
+*.log
+*.tmp
