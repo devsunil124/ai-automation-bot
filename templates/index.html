@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="font-family: Arial; max-width: 600px; margin: 2rem auto;">
+    <h2>💬 ChatGPT Web Interface</h2>
+    <form method="POST">
+        <label>Enter a message:</label><br>
+        <input type="text" name="message" style="width: 100%; padding: 0.5rem;" required><br><br>
+        <input type="submit" value="Send" style="padding: 0.5rem 1rem;">
+    </form>
+    {% if chat_input %}
+        <h3>Your message:</h3>
+        <p>{{ chat_input }}</p>
+        <h3>AI reply:</h3>
+        <p>{{ chat_output }}</p>
+    {% endif %}
+</body>
+</html>
