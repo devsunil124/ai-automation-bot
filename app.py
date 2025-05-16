@@ -1,17 +1,35 @@
 import os
+import openai
 from flask import Flask, request, make_response
 from slack_sdk import WebClient
 from slack_sdk.signature import SignatureVerifier
 from dotenv import load_dotenv
 
+
 # Load environment variables from .env file
 load_dotenv()
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")  # Sets the API key
 app = Flask(__name__)
 
 # Setup Slack client and verifier
 client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
 verifier = SignatureVerifier(signing_secret=os.getenv("SLACK_SIGNING_SECRET"))
+
+def get_chatgpt_reply(user_message):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        reply = response['choices'][0]['message']['content']
+        return reply.strip()
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route("/slack/events", methods=["POST"])
 def slack_events():
@@ -31,8 +49,13 @@ def slack_events():
         channel = event_data["event"]["channel"]
         text = event_data["event"]["text"]
 
-        response = f"👋 Hi <@{user}>! You said: {text}"
-        client.chat_postMessage(channel=channel, text=response)
+        # Remove the bot mention from text
+        message = text.split('>', 1)[-1].strip()
+
+        # Get ChatGPT reply
+        ai_reply = get_chatgpt_reply(message)
+
+        client.chat_postMessage(channel=channel, text=f"<@{user}> {ai_reply}")
 
     return make_response("OK", 200)
 
